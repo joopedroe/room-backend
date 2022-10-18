@@ -1,0 +1,36 @@
+version: "3.9"
+
+services:
+  mysql:
+    container_name: test-db
+    image: mysql:5.7
+    volumes:
+      - ./data/:/var/lib/mysql
+    ports:
+      - "${DB_PORT}:3306"
+    networks:
+      - erural
+    environment:
+      MYSQL_DATABASE: "${DB_DATABASE}"
+      MYSQL_PASSWORD: "${DB_PASSWORD}"
+      MYSQL_ALLOW_EMPTY_PASSWORD: 1
+
+  adonis:
+    container_name: testerural-webservice
+    build: .
+    environment:
+      - HOST=0.0.0.0
+    ports:
+      - "${PORT}:3322"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    networks:
+      - erural
+    depends_on:
+      - mysql
+    env_file: .env
+
+networks:
+  erural:
+    driver: bridge
